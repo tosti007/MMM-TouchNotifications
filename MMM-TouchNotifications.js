@@ -24,7 +24,7 @@ Module.register("MMM-TouchNotifications", {
         buttons: {
             "example": {
                 text: "Default",
-                symbol: "ban"
+                symbol: "ban",
                 type: "SHOW_ALERT",
                 payload: {
                     type: "notification",
