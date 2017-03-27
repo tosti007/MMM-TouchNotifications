@@ -1,0 +1,41 @@
+/*****************************************************
+ * Magic Mirror                                      *
+ * Custom CSS for MMM-TouchNotifications             *
+ *                                                   *
+ * By Brian Janssen                                  *
+ * MIT Licensed.                                     *
+ *                                                   *
+ *****************************************************/
+.region.fullscreen {
+    z-index: -1;
+}
+
+.notification-menu {
+    display: flex;
+    align-items: stretch;
+}
+
+.notification-button {
+    z-index: 1;
+    /* Border */
+    border-style: solid;
+    border-width: 2px;
+    border-color: #999;
+    border-radius: 5px;
+
+    /* as container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 7px;
+    padding: 5px 12px;
+}
+
+.notification-picture {
+    margin: 5px 0;
+}
+
+.notification-text {
+    margin: -5px 0;
+}
