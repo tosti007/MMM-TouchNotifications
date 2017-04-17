@@ -40,6 +40,15 @@ Module.register("MMM-TouchNotifications", {
     return ["font-awesome.css", this.file('MMM-TouchNotifications.css')];
   },
 
+  start: function() {
+    this.config.picturePlacement = {
+      "right": "row-reverse",
+      "left": "row",
+      "top": "column",
+      "bottom": "column-reverse"
+    }[this.config.picturePlacement];
+  },
+
   // Override dom generator.
   getDom: function() {
     var menu = document.createElement("span");
@@ -47,30 +56,24 @@ Module.register("MMM-TouchNotifications", {
     menu.id = this.identifier + "_menu";
     menu.style.flexDirection = this.config.direction;
 
-    for (var name in this.config.buttons) {
-      menu.appendChild(this.createButton(this, name, this.config.buttons[name], this.config.picturePlacement));
+    for (var index in this.config.buttons) {
+      menu.appendChild(this.createButton(this, index, this.config.buttons[index]));
     }
 
     return menu;
   },
 
-  createButton: function(self, name, data, placement) {
+  createButton: function(self, index, data) {
     var item = document.createElement("span");
-    item.id = self.identifier + "_button_" + name;
+    item.id = self.identifier + "_button_" + index;
     item.className = "notification-button";
     item.style.minWidth = self.config.minWidth;
     item.style.minHeight = self.config.minHeight;
+    item.style.flexDirection = self.config.picturePlacement;
 
     item.addEventListener("click", function() {
       self.sendNotification(data.type, data.payload);
     });
-
-    item.style.flexDirection = {
-      "right": "row-reverse",
-      "left": "row",
-      "top": "column",
-      "bottom": "column-reverse"
-    }[placement];
 
     if (!self.config.showBorder) {
       item.style.borderColor = "black";
@@ -84,7 +87,7 @@ Module.register("MMM-TouchNotifications", {
         symbol.className += data.size == 1 ? "g" : "x";
       }
 
-      if (data.text && placement === "left") {
+      if (data.text && self.config.picturePlacement === "row") { // row = left
         symbol.style.marginRight = "10px";
       }
 
@@ -97,7 +100,7 @@ Module.register("MMM-TouchNotifications", {
       if (data.width) image.width = data.width;
       if (data.height) image.height = data.height;
 
-      if (data.text && placement === "left") {
+      if (data.text && self.config.picturePlacement === "row") { // row = left
         image.style.marginRight = "10px";
       }
 
@@ -109,7 +112,7 @@ Module.register("MMM-TouchNotifications", {
       text.className = "notification-text";
       text.innerHTML = data.text;
 
-      if ((data.symbol || data.img) && placement === "right") {
+      if ((data.symbol || data.img) && self.config.picturePlacement === "row-reverse") { // right = row-reverse
         text.style.marginRight = "10px";
       }
 
