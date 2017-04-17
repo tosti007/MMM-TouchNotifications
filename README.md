@@ -1,7 +1,6 @@
 <!-- All the links I use multiple times in this readme file, this way I won't have to copy paste so often -->
 [MMM-TouchNotifications]: https://github.com/tosti007/MMM-TouchNotifications
 
-
 # MMM-TouchNavigation
 
 This an extension for the [MagicMirror²](https://magicmirror.builders/).
@@ -46,39 +45,68 @@ The following properties can be configured:
 | `minHeight`        | The minimum height for all the buttons. <br><br> **Possible values:** `css length` <br> **Default value:** `0px`
 | `picturePlacement` | The location of the symbol or image relative to the text. <br><br> **Possible values:** `left`, `right`, `top` or `bottom` <br> **Default value:** `left`
 | `direction`        | The direction of the menu. <br><br> **Possible values:** `row`, `column`, `row-reverse` or `column-reverse`<br> **Default value:** `row`
-| `buttons`          | All the different buttons in the menu. <br><br> **Possible values:** a button configuration, see [Configuring Buttons](#configuring-buttons) <br> **Default value:** a button
+| `buttons`          | All the different buttons in the menu. <br><br> **Note:** required, see [Configuring Buttons](#configuring-buttons) <br> **Possible values:** an array of button configurations <br> **Default value:** a button example
 
 
 ## Configuring Buttons
-Buttons have to be placed in `buttons` in the `config`. A button contains a name as key and a configuration in an object (`{}`). 
-**Note:** The name does not have any effect on the menu. It is only used as an identifier for each button.
+Buttons have to be placed in `buttons` in the `config`. A button contains a configuration in an object (`{}`).
 
-| Option    | Description
-| --------- | -----------
-| `text`    | A string to display in the button. <br><br> **Note:** if no value is set no text will be displayed. <br> **Possible values:** `string`
-| `symbol`  | A symbol to display in the button. <br><br> **Note:** if no value is set no symbol will be displayed. <br> **Possible values:** See [Font Awesome](http://fontawesome.io/icons/) website
-| `size`    | The size of the symbol. <br><br> **Note:** will only have effect on the symbol. <br> **Default value:** `1` <br> **Possible values:** `1`, `2`, `3`, `4` or `5`
-| `img`     | An image to display in the button. <br><br> **Note:** it will only display if no symbol is set. <br> **Possible values:** A path to an image (an url or local path)
-| `width`   | The width of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
-| `height`  | The height of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
-| `type`    | The kind of notification to send when pressed. <br><br> **Note:** this is required. This defines what notification will be send. <br> **Possible values:** `string`
-| `payload` | The payload to send with the notification. <br><br> **Note:** it depends on the module you want to address with `type` what you want to use here.
+| Option         | Description
+| -------------- | -----------
+| `text`         | A string to display in the button. <br><br> **Note:** if no value is set no text will be displayed. <br> **Possible values:** `string`
+| `symbol`       | A symbol to display in the button. <br><br> **Note:** if no value is set no symbol will be displayed. <br> **Possible values:** See [Font Awesome](http://fontawesome.io/icons/) website
+| `size`         | The size of the symbol. <br><br> **Note:** will only have effect on the symbol. <br> **Default value:** `1` <br> **Possible values:** `1`, `2`, `3`, `4` or `5`
+| `img`          | An image to display in the button. <br><br> **Note:** it will only display if no symbol is set. <br> **Possible values:** A path to an image (an url or local path)
+| `width`        | The width of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
+| `height`       | The height of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
+| `notification` | The notification that should be send when pressed. <br><br> **Note:** required, see [Configuring Notifications](#configuring-notifications) <br> **Possible values:** object (`{}`) or array (`[]`) of objects
 
 An example:
 ````javascript
-buttons: {
-    "example": {
-        text: "Default",
-        symbol: "ban"
-        type: "SHOW_ALERT",
-        payload: {
-            type: "notification",
-            title: "Example",
-            message: "Hello World!"
-        }
+buttons: [{
+  // this is a button with only a single notification
+  text: "Example 1",
+  symbol: "ban",
+  notification: {
+    type: "SHOW_ALERT",
+    payload: {
+      type: "notification",
+      title: "Example 1",
+      message: "Hello World!"
     }
-}
+  }
+}, {
+  // this is a button with multiple notifications
+  text: "Example 2",
+  notification: [{
+    // the first notification
+    type: "SHOW_ALERT",
+    payload: {
+      type: "notification",
+      title: "Example 2",
+      message: "Hello"
+    }
+  }, {
+    // the second notification
+    type: "SHOW_ALERT",
+    payload: {
+      type: "notification",
+      title: "Example 2",
+      message: "World!"
+    }
+  }]
+}]
 ````
+
+
+## Configuring Notifications
+An notification configuration is fairly simple and only contains a little bit of information which is both required. This will be the actual notification that will be send when the button is pressed. It totally depends on the other module what payload should be here.
+
+| Option    | Description
+| --------- | -----------
+| `type`    | The kind of notification to send when pressed. <br><br> **Note:** required <br> **Possible values:** `string`
+| `payload` | The payload to send with the notification. <br><br> **Note:** it depends on the module you want to address with `type` what you want to use here.
+
 
 ## Notes
 * **Important:** unfortunatly positioning this module as fullscreen will result in the menu floating top left. I currently do not know how to fix this but will look into it. If you know how don't hesitate to either write me or send me a pull request!

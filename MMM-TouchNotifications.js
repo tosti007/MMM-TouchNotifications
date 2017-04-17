@@ -21,18 +21,39 @@ Module.register("MMM-TouchNotifications", {
     // The direction of the menu.
     direction: "row",
     // All the different buttons in the menu.
-    buttons: {
-      "example": {
-        text: "Default",
-        symbol: "ban",
+    buttons: [{
+      // this is a button with only a single notification
+      text: "Example 1",
+      symbol: "ban",
+      notification: {
         type: "SHOW_ALERT",
         payload: {
           type: "notification",
-          title: "Example",
+          title: "Example 1",
           message: "Hello World!"
         }
       }
-    }
+    }, {
+      // this is a button with multiple notifications
+      text: "Example 2",
+      notification: [{
+        // the first notification
+        type: "SHOW_ALERT",
+        payload: {
+          type: "notification",
+          title: "Example 2",
+          message: "Hello"
+        }
+      }, {
+        // the second notification
+        type: "SHOW_ALERT",
+        payload: {
+          type: "notification",
+          title: "Example 2",
+          message: "World!"
+        }
+      }]
+    }]
   },
 
   // Define required styles.
@@ -71,9 +92,17 @@ Module.register("MMM-TouchNotifications", {
     item.style.minHeight = self.config.minHeight;
     item.style.flexDirection = self.config.picturePlacement;
 
-    item.addEventListener("click", function() {
-      self.sendNotification(data.type, data.payload);
-    });
+    if (data.notification.type && data.notification.payload) {
+      item.addEventListener("click", function() {
+        self.sendNotification(data.notification.type, data.notification.payload);
+      });
+    } else {
+      item.addEventListener("click", function() {
+        for (var index in data.notification) {
+          self.sendNotification(data.notification[index].type, data.notification[index].payload);
+        }
+      });
+    }
 
     if (!self.config.showBorder) {
       item.style.borderColor = "black";
