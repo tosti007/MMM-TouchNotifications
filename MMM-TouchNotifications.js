@@ -68,6 +68,39 @@ Module.register("MMM-TouchNotifications", {
       "top": "column",
       "bottom": "column-reverse"
     }[this.config.picturePlacement];
+
+    for (var i = 0; i < this.config.buttons.length; i++) {
+      if (typeof this.config.buttons[i].notification === "string" && this.config.buttons[i].select === undefined) {
+        this.config.buttons[i].select = this.config.buttons[i].notification;
+      }
+    }
+  },
+
+  notificationReceived: function(notification, payload, sender) {
+    var event;
+    if (window.CustomEvent) {
+      event = new CustomEvent("touch-notification", {
+        detail: {
+          "notification": notification,
+          "payload": payload,
+          "sender": sender
+        }
+      });
+    } else {
+      event = document.createEvent("CustomEvent");
+      event.initCustomEvent("touch-notification", true, true, {
+        "notification": notification,
+        "payload": payload,
+        "sender": sender
+      });
+    }
+
+    var element = document.getElementById(this.identifier + "_menu");
+    if (element) {
+      // element.dispatchEvent(event); argh events don't pass down to children
+      element.notification(event);
+    }
+
   },
 
   // Override dom generator.
@@ -80,6 +113,13 @@ Module.register("MMM-TouchNotifications", {
     for (var index in this.config.buttons) {
       menu.appendChild(this.createButton(this, index, this.config.buttons[index]));
     }
+
+    menu.notification = function(event) {
+      var childs = menu.children;
+      for (var i = 0; i < childs.length; i++) {
+        childs[i].dispatchEvent(event);
+      }
+    };
 
     return menu;
   },
@@ -98,6 +138,9 @@ Module.register("MMM-TouchNotifications", {
 
     if (data.notification) {
       self.buttonClick(self, item, data.notification);
+    }
+    if (data.select) {
+      self.buttonEvent(self, item, data.select);
     }
 
     self.buttonPicture(self, item, data);
@@ -152,16 +195,80 @@ Module.register("MMM-TouchNotifications", {
   },
 
   buttonClick: function(self, button, notification) {
-    if (notification.type && notification.payload) {
-      button.addEventListener("click", function() {
-        self.sendNotification(notification.type, notification.payload);
-      });
-    } else {
-      button.addEventListener("click", function() {
-        for (var index in notification) {
-          self.sendNotification(notification[index].type, notification[index].payload);
+    if (typeof notification !== "string") {
+      if (notification.type && notification.payload) {
+        button.addEventListener("click", function() {
+          self.sendNotification(notification.type, notification.payload);
+        });
+      } else {
+        button.addEventListener("click", function() {
+          for (var index in notification) {
+            self.buttonClick(self, button, notification[index]);
+          }
+        });
+      }
+      return;
+    }
+
+    var data = notification.split(" ");
+    switch (data[0]) {
+      case "profile":
+        button.addEventListener("click", function() {
+          self.sendNotification("CURRENT_PROFILE", data[1]);
+        });
+        break;
+
+      case "show":
+      case "hide":
+        // TODO
+        break;
+    }
+  },
+
+  buttonEvent: function(self, button, select) {
+    if (typeof select === "function") {
+      button.addEventListener("touch-notification", function(e) {
+        var result = select(e.detail.notification, e.detail.payload,
+          button.className === "notification-button selected", e.detail.sender);
+
+        if (result < 0) {
+          button.className = "notification-button";
+        } else if (result > 0) {
+          button.className = "notification-button selected";
         }
       });
+      return;
+    }
+
+    var data = select.split(" ");
+    switch (data[0]) {
+      case "profile":
+        self.buttonEvent(self, button, function(type, payload) {
+          if (type === "CHANGED_PROFILE") {
+            if (payload.to === data[1]) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }
+          return 0;
+        });
+        break;
+
+      case "click":
+        button.addEventListener("click", function() {
+          if (button.className === "notification-button selected") {
+            button.className = "notification-button";
+          } else {
+            button.className = "notification-button selected";
+          }
+        });
+        break;
+
+      case "show":
+      case "hide":
+        // TODO
+        break;
     }
   }
 });

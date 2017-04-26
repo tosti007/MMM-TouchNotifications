@@ -59,7 +59,8 @@ Buttons have to be placed in `buttons` in the `config`. A button contains a conf
 | `img`          | An image to display in the button. <br><br> **Note:** it will only display if no symbol is set. <br> **Possible values:** A path to an image (an url or local path)
 | `width`        | The width of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
 | `height`       | The height of the image. <br><br> **Note:** will only have effect on the image. <br> **Possible values:** `number`
-| `notification` | The notification that should be send when pressed. <br><br> **Note:** required, see [Configuring Notifications](#configuring-notifications) <br> **Possible values:** object (`{}`) or array (`[]`) of objects
+| `notification` | The notification that should be send when pressed. <br><br> **Note:** required, see [Configuring Notifications](#configuring-notifications) <br> **Possible values:** object (`{}`), array (`[]`) of objects or string
+| `select`       | A function to determine if the button is selected. <br><br> **Note:** optional, see [Configuring Select](#configuring-select) <br> **Possible values:** function or string
 
 An example:
 ````javascript
@@ -102,11 +103,53 @@ buttons: [{
 ## Configuring Notifications
 An notification configuration is fairly simple and only contains a little bit of information which is both required. This will be the actual notification that will be send when the button is pressed. It totally depends on the other module what payload should be here.
 
+There are also some pre-configured shortcuts to make your life easier. The shortcuts are strings instead of objects and may take some additional information. They are used the same way as a "normal" configuration.
+
 | Option    | Description
 | --------- | -----------
 | `type`    | The kind of notification to send when pressed. <br><br> **Note:** required <br> **Possible values:** `string`
 | `payload` | The payload to send with the notification. <br><br> **Note:** it depends on the module you want to address with `type` what you want to use here.
 
+The pre-configured shortcuts:
+
+| Shortcut       | Description
+| -------------- | -----------
+| `profile name` | This shortcut is for in combination with the [MMM-ProfileSwitcher](https://github.com/tosti007/MMM-ProfileSwitcher) module. It allows you to switch between profiles. <br><br> **Arguments:** <br> **`name`:** The profile name used for the [MMM-ProfileSwitcher](https://github.com/tosti007/MMM-ProfileSwitcher).
+<!-- WORK IN PROGRESS | `hide modules` | This shortcut allows you to toggle different modules to hidden or shown. <br><br> **Arguments:** <br> **`modules`:** The names of modules that should be hidden/shown. Multiple module names should be seperated by a space.
+| `show modules` | Same as hide. -->
+
+## Configuring Select
+The select option allows the button to fade when a certain notification is recieved by the module. You might need a bit more understanding of `javascript` and the MagicMirror framework in order be able to write your own functions, hence there are some pre-configured shortcuts to make your life easier and allow you to configure the button without an understanding of functions in javascript.
+
+The pre-configured shortcuts:
+
+| Shortcut       | Description
+| -------------- | -----------
+| `profile name` | This shortcut is for in combination with the [MMM-ProfileSwitcher](https://github.com/tosti007/MMM-ProfileSwitcher) module. The button will fade when the configured profile is currently active. <br><br> **Arguments:** <br> **`name`:** The profile name
+| `click`        | When the button is clicked it will toggle between faded in or out.
+<!-- WORK IN PROGRESS | `hide modules` | This shortcut allows you to toggle different modules to hidden or shown. <br><br> **Arguments:** <br> **`modules`:** The names of modules that should be hidden/shown. Multiple module names should be seperated by a space.
+| `show modules` | Same as hide. -->
+
+Instead of the pre-configured shortcuts you can also write your own function. The function will be used whenever the module recieves an notification form a different module. The function will be given the input depending on the recieved notification.
+
+#### The function's input
+The function will be passed up to 4 arguments. These come from the recieved notification.
+
+| Argument       | Description
+| -------------- | -----------
+| `notification` | The type of notification recieved. <br><br> **Note:** This is the same as the first argument passed through the notificationReceived function of the module. <br> **Type:** `string`
+| `payload`      | The payload that came with the notification. <br><br> **Note:** This is the same as the second argument passed through the notificationReceived function of the module. <br> **Type:** anything (depends on the notification)
+| `selected`     | A boolean that determines if the button is currently selected. <br><br> **Type:** `boolean`
+| `sender`       | The sender from which the notification originated. <br><br> **Note:** This is the same as the third argument passed through the notificationReceived function of the module. <br> **Type:** `string`
+
+#### The function's output
+The function should always give a return value (a `number`). Depending on the value of the returned number it the button's state will be changed.
+
+| Value        | Effect
+| ------------ | ------
+| `-1` or less | The button will return to normal (non faded).
+| exactly `0`  | The button will remain the way it was.
+| `1` or more  | The button will become faded.
 
 ## Notes
 * **Important:** unfortunatly positioning this module as fullscreen will result in the menu floating top left. I currently do not know how to fix this but will look into it. If you know how don't hesitate to either write me or send me a pull request!
