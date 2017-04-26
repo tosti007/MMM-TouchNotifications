@@ -58,7 +58,7 @@ Module.register("MMM-TouchNotifications", {
 
   // Define required styles.
   getStyles: function() {
-    return ["font-awesome.css", this.file('MMM-TouchNotifications.css')];
+    return ["font-awesome.css", this.file("MMM-TouchNotifications.css")];
   },
 
   start: function() {
@@ -92,22 +92,21 @@ Module.register("MMM-TouchNotifications", {
     item.style.minHeight = self.config.minHeight;
     item.style.flexDirection = self.config.picturePlacement;
 
-    if (data.notification.type && data.notification.payload) {
-      item.addEventListener("click", function() {
-        self.sendNotification(data.notification.type, data.notification.payload);
-      });
-    } else {
-      item.addEventListener("click", function() {
-        for (var index in data.notification) {
-          self.sendNotification(data.notification[index].type, data.notification[index].payload);
-        }
-      });
-    }
-
     if (!self.config.showBorder) {
       item.style.borderColor = "black";
     }
 
+    if (data.notification) {
+      self.buttonClick(self, item, data.notification);
+    }
+
+    self.buttonPicture(self, item, data);
+    self.buttonText(self, item, data);
+
+    return item;
+  },
+
+  buttonPicture: function(self, button, data) {
     if (data.symbol) {
       var symbol = document.createElement("span");
       symbol.className = "notification-picture fa fa-" + data.symbol;
@@ -120,7 +119,8 @@ Module.register("MMM-TouchNotifications", {
         symbol.style.marginRight = "10px";
       }
 
-      item.appendChild(symbol);
+      button.appendChild(symbol);
+
     } else if (data.img) {
       var image = document.createElement("img");
       image.className = "notification-picture";
@@ -133,9 +133,11 @@ Module.register("MMM-TouchNotifications", {
         image.style.marginRight = "10px";
       }
 
-      item.appendChild(image);
+      button.appendChild(image);
     }
+  },
 
+  buttonText: function(self, button, data) {
     if (data.text) {
       var text = document.createElement("span");
       text.className = "notification-text";
@@ -145,9 +147,21 @@ Module.register("MMM-TouchNotifications", {
         text.style.marginRight = "10px";
       }
 
-      item.appendChild(text);
+      button.appendChild(text);
     }
+  },
 
-    return item;
+  buttonClick: function(self, button, notification) {
+    if (notification.type && notification.payload) {
+      button.addEventListener("click", function() {
+        self.sendNotification(notification.type, notification.payload);
+      });
+    } else {
+      button.addEventListener("click", function() {
+        for (var index in notification) {
+          self.sendNotification(notification[index].type, notification[index].payload);
+        }
+      });
+    }
   }
 });
