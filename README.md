@@ -1,7 +1,7 @@
 <!-- All the links I use multiple times in this readme file, this way I won't have to copy paste so often -->
 [MMM-TouchNotifications]: https://github.com/tosti007/MMM-TouchNotifications
 
-# MMM-TouchNavigation
+# MMM-TouchNotifications
 
 This an extension for the [MagicMirror²](https://magicmirror.builders/).
 This Module adds a touch menu to send different notifications to the other modules.
