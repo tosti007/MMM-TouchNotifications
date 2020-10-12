@@ -196,7 +196,7 @@ Module.register("MMM-TouchNotifications", {
 
   buttonClick: function(self, button, notification) {
     if (typeof notification !== "string") {
-      if (notification.type && notification.payload) {
+      if (notification.type && (notification.payload || notification.payload == 0)) {
         button.addEventListener("click", function() {
           self.sendNotification(notification.type, notification.payload);
         });
